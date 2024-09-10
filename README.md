@@ -2,16 +2,28 @@
 import requests
 from  bs4 import BeautifulSoup
 import csv
+import time
 
-# link = 'https://www.flipkart.com/search?q=phone&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off'
 link = input('url: ')
+pages = input('pages? ')
 
 r = requests.get(link)
 scrap = BeautifulSoup(r.content, 'html.parser')
 
 data = []
 # products = scrap.findAll('div', class_='tUxRFH')
-pages = int(scrap.find('span', class_='BUOuZu').text.split(' ')[3])
+while 1:
+    try:
+        page_request = int(scrap.find('span', class_='BUOuZu').text.split(' ')[3])
+        break
+    except:
+        print('Connection problem between requests and webpage.. please rerun the program')
+    time.sleep(1)
+
+if pages == '':
+    pages = page_request
+else:
+    pages = int(pages)
 
 for page in range(0, pages):
     r = requests.get(link+f'&page={page+1}')
@@ -47,7 +59,3 @@ with open(file, 'w', newline='', encoding='utf-8') as f:
     writer = csv.writer(f)
     writer.writerow(['Name', 'Price', 'Rating', 'Reviews', 'Description'])
     writer.writerows(data)
-
-
-# https://www.flipkart.com/search?q=laptop&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off
-# https://www.flipkart.com/search?q=laptop&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off&page=2
